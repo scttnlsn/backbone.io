@@ -68,6 +68,11 @@ Or use the provided shortcut:
     initialize: function() {
         this.bindBackend();
     }
+    
+The event prefix `backend` is used by default but this can be customized by passing
+options to the `listen` function on the server:
+
+    backboneio.listen(app, { mybackend: new backboneio.Backend() }, { event: 'myevent' });
 
 Backends
 --------
