@@ -23,7 +23,7 @@ On the server:
 
 On the client:
 
-    <!-- Include jQuery, Underscore, Backbone -->
+    <!-- Include Underscore, Backbone -->
     
     <script src="/socket.io/socket.io.js"></script>
     <script src="/socket.io/backbone.io.js"></script>
