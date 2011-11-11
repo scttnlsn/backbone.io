@@ -15,7 +15,9 @@ On the server:
 
     var http        = require('http'),
         backboneio  = require('backbone.io'),
-        app         = http.createServer().listen(3000);
+        app         = http.createServer();
+        
+    app.listen(3000);
 
     backboneio.listen(app, { mybackend: new backboneio.Backend() });
 
