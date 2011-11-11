@@ -5,6 +5,7 @@ Storage-agnostic Backbone.js sync override and server notifications via Socket.I
 
 Install
 -------
+
     npm install backbone.io
     
 Usage
@@ -62,8 +63,61 @@ could keep collections synced in realtime with the following event bindings:
     
 Or use the provided shortcut:
     
-    ...
+    backend: 'mybackend',
     
     initialize: function() {
         this.bindBackend();
     }
+
+Backends
+--------
+
+A backend is just a set of four functions, `create`, `read`, `update`, and `delete`,
+corresponding to the methods of `Backbone.sync`.  Each takes a model object and a callback.
+For example, a backend that interacts with a database might look something like this:
+
+    var MyBackend = {
+        create: function(model, callback) {
+            db.insert(model, function(err, record) {
+                // The returned record must have an `id`
+                // attribute defined.
+                callback(err, record);
+            });
+        },
+        
+        read: function(model, callback) {
+            if (model.id) {
+                // When an `id` is present, return single record
+                db.findOne({ id: model.id }, function(err, record) {
+                    callback(err, record);
+                });
+            } else {
+                // Otherwise return all records
+                db.find({}, function(err, records) {
+                    callback(err, records);
+                });
+            }
+        },
+        
+        update: function(model, callback) {
+            db.update({ id: model.id }, model, function(err) {
+                // Return the updated model
+                callback(err, model);
+            });
+        },
+        
+        delete: function(model, callback) {
+            db.delete({ id: model.id }, function(err) {
+                // Return the deleted model
+                callback(err, model);
+            });
+        }
+    };
+    
+And use your custom backend like so:
+
+    backboneio.listen(app, { mybackend: MyBackend });
+    
+The default backend included with Backbone.IO is meant to be an example and
+simply stores all models in memory with no sort of persistence mechanism.
+Don't use it!
