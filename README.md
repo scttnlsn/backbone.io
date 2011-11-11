@@ -78,7 +78,7 @@ events, a generic `backend` event is also triggered when a model is synced.
         // Method will be one of create, read, update, or delete
     });
     
-The event prefix `backend` is used by default but this can be customized setting the
+The event prefix `backend` is used by default but this can be customized by setting the
 event name on the server.
 
     backboneio.listen(app, { mybackend: new backboneio.Backend() }, { event: 'myevent' });
@@ -86,9 +86,9 @@ event name on the server.
 Backends
 --------
 
-A backend is just a set of four functions, `create`, `read`, `update`, and `delete`,
-corresponding to the methods of `Backbone.sync`.  Each takes a model object and a callback.
-For example, a backend that interacts with a database might look something like this:
+A backend is an object that exposes four functions, `create`, `read`, `update`, and `delete`,
+corresponding to the methods of `Backbone.sync`.  Each function takes a model object and a
+callback.  For example, a backend that interacts with a database might look something like this:
 
     var MyBackend = {
         create: function(model, callback) {
@@ -128,10 +128,9 @@ For example, a backend that interacts with a database might look something like 
         }
     };
     
-And use your custom backend like so:
+One can then use the custom backend like so:
 
     backboneio.listen(app, { mybackend: MyBackend });
     
-The default backend included with Backbone.IO is meant to be an example and
-simply stores all models in memory with no sort of persistence mechanism.
-Don't use it!
+The default backend included with Backbone.IO is meant to be an example and simply stores
+all models in memory with no sort of persistence mechanism. Don't use it!
