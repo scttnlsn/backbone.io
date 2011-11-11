@@ -14,5 +14,9 @@
     "dependencies": {
         "socket.io": ">= 0.8.7",
         "underscore": ">= 1.2.1"
+    },
+    
+    "devDependencies": {
+        "express": ">= 2.5.0"
     }
 }
