@@ -1,0 +1,10 @@
+- Authorization!
+  See https://github.com/LearnBoost/socket.io/wiki/Authorizing
+  
+- Include a couple useful backends
+  i.e. MongoDB, Redis, etc.
+  
+- Document socket.io customizations
+  i.e. Redis store
+  
+- Investigate single model notifications
