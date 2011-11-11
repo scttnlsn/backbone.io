@@ -69,8 +69,15 @@ Or use the provided shortcut:
         this.bindBackend();
     }
     
-The event prefix `backend` is used by default but this can be customized by passing
-options to the `listen` function on the server:
+In addition to `backend:create`, `backend:read`, `backend:update`, and `backend:delete`
+events, a generic `backend` event is also triggered when a model is synced.
+
+    this.bind('backend', function(method, model) {
+        // Method will be one of create, read, update, or delete
+    });
+    
+The event prefix `backend` is used by default but this can be customized setting the
+event name on the server.
 
     backboneio.listen(app, { mybackend: new backboneio.Backend() }, { event: 'myevent' });
 
