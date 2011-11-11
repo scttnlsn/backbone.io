@@ -1,0 +1,75 @@
+<html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+    <script src="http://documentcloud.github.com/underscore/underscore-min.js"></script>
+    <script src="http://documentcloud.github.com/backbone/backbone-min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/socket.io/backbone.io.js"></script>
+    
+    <script>
+        var Message = Backbone.Model.extend();
+    
+        var Messages = Backbone.Collection.extend({
+            
+            // Specify the backend with which to sync
+            backend: 'messages',
+        
+            model: Message,
+        
+            initialize: function() {
+                // Setup default backend bindings
+                // (see lib/browser.js for details).
+                this.bindBackend();
+            }
+        
+        });
+    
+        var MessagesView = Backbone.View.extend({
+        
+            events: {
+                'click .send': 'send'
+            },
+        
+            initialize: function(options) {
+                _.bindAll(this, 'render', 'send');
+            
+                this.collection.bind('add', this.render);
+                this.collection.bind('reset', this.render);
+                this.collection.fetch();
+                
+                this.template = _.template($('#messages-template').html());
+            },
+        
+            render: function() {
+                $(this.el).html(this.template());
+                
+                this.collection.each(function(message) {
+                    this.$('ul').append($('<li>', { html: message.get('text') }));
+                });
+                
+                return this;
+            },
+        
+            send: function() {
+                this.collection.create({ text: this.$('.message').val() });
+                this.$('.message').val('');
+            }
+        
+        });
+        
+        $(function() {
+            new MessagesView({ el: $('#messages'), collection: new Messages() }).render();
+        });
+    </script>
+    
+    <script id="messages-template" type="text/template">
+        <ul></ul>
+        <input class="message" type="text">
+        <input class="send" type="submit" value="Send">
+    </script>
+</head>
+<body>
+    <h1>Messages</h1>
+    <div id="messages"></div>
+</body>
+</html>
