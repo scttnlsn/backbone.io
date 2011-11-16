@@ -133,8 +133,8 @@ One can then use the custom backend like so:
 
     backboneio.listen(app, { mybackend: MyBackend });
     
-Customizations
---------------
+Further Customizations
+----------------------
 
 Since the call to `listen` returns the Socket.IO object, it can be manipulated beyond the
 basics of Backbone.IO.  Take a look at `examples/auth.js`, for example, to see how this can
