@@ -19,7 +19,7 @@ On the server:
         
     app.listen(3000);
 
-    backboneio.listen(app, { mybackend: new backboneio.Backend() });
+    backboneio.listen(app, { mybackend: new backboneio.backend.Memory() });
 
 On the client:
 
@@ -81,7 +81,7 @@ events, a generic `backend` event is also triggered when a model is synced.
 The event prefix `backend` is used by default but this can be customized by setting the
 event name on the server.
 
-    backboneio.listen(app, { mybackend: new backboneio.Backend() }, { event: 'myevent' });
+    backboneio.listen(app, { mybackend: new backboneio.backend.Memory() }, { event: 'myevent' });
 
 Backends
 --------
@@ -131,6 +131,3 @@ callback.  For example, a backend that interacts with a database might look some
 One can then use the custom backend like so:
 
     backboneio.listen(app, { mybackend: MyBackend });
-    
-The default backend included with Backbone.IO is meant to be an example and simply stores
-all models in memory with no sort of persistence mechanism. Don't use it!
