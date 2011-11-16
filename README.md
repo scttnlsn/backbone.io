@@ -132,3 +132,10 @@ callback.  For example, a backend that interacts with a database might look some
 One can then use the custom backend like so:
 
     backboneio.listen(app, { mybackend: MyBackend });
+    
+Customizations
+--------------
+
+Since the call to `listen` returns the Socket.IO object, it can be manipulated beyond the
+basics of Backbone.IO.  Take a look at `examples/auth.js`, for example, to see how this can
+be leveraged to implement a custom authorization scheme.
