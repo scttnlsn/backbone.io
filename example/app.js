@@ -6,4 +6,5 @@ app.use(express.static(__dirname));
 app.listen(3000);
 console.log('http://localhost:3000/');
 
-backboneio.listen(app, { messages: new backboneio.Backend() });
+var Backend = require('../lib/backends/memory');
+backboneio.listen(app, { messages: new Backend() });
