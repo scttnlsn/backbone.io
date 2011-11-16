@@ -19,7 +19,8 @@ On the server:
         
     app.listen(3000);
 
-    backboneio.listen(app, { mybackend: new backboneio.backend.Memory() });
+    var Backend = require('backbone.io/backends/memory');
+    backboneio.listen(app, { mybackend: new Backend() });
 
 On the client:
 
@@ -81,7 +82,7 @@ events, a generic `backend` event is also triggered when a model is synced.
 The event prefix `backend` is used by default but this can be customized by setting the
 event name on the server.
 
-    backboneio.listen(app, { mybackend: new backboneio.backend.Memory() }, { event: 'myevent' });
+    backboneio.listen(app, { mybackend: new Backend() }, { event: 'myevent' });
 
 Backends
 --------
