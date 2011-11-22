@@ -58,7 +58,7 @@ could keep collections synced in realtime with the following event bindings:
                 self.get(model.id).set(model);
             });
             this.bind('backend:delete', function(model) {
-                self.remove(model);
+                self.remove(model.id);
             });
         }
         
