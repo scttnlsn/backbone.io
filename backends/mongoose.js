@@ -5,6 +5,7 @@ module.exports = function(Model, options) {
     var idQuery = function(model) {
         var query = {};
         query[options.idAttribute] = model[options.idAttribute];
+        return query;
     };
 
     this.create = function(model, callback) {
