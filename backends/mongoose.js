@@ -42,12 +42,13 @@ module.exports = function(Model, options) {
     };
 
     this.delete = function(model, callback) {
-        Model.findById(model[options.idAttribute], function(err, doc) {
+        var query = idQuery(model);
+        
+        Model.remove(query, function(err) {
             if (err) {
                 callback(err);
             } else {
-                doc.remove();
-                callback(null, doc);
+                callback(null, model);
             }
         });
     };
