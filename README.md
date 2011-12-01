@@ -13,10 +13,10 @@ Usage
 
 On the server:
 
-    var http        = require('http'),
-        backboneio  = require('backbone.io'),
-        app         = http.createServer();
-        
+    var http = require('http');
+    var backboneio = require('backbone.io');
+    
+    var app = http.createServer();    
     app.listen(3000);
 
     var Backend = require('backbone.io/backends/memory');
@@ -137,5 +137,4 @@ Further Customizations
 ----------------------
 
 Since the call to `listen` returns the Socket.IO object, it can be manipulated beyond the
-basics of Backbone.IO.  Take a look at `examples/auth.js`, for example, to see how this can
-be leveraged to implement a custom authorization scheme.
+basics of Backbone.IO.
