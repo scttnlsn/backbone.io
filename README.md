@@ -19,8 +19,10 @@ On the server:
     var app = http.createServer();    
     app.listen(3000);
 
-    var Backend = require('backbone.io/backends/memory');
-    backboneio.listen(app, { mybackend: new Backend() });
+    var backend = backboneio.createBackend();
+    backend.use(backboneio.middleware.memoryStore());
+    
+    backboneio.listen(app, { mybackend: backend });
 
 On the client:
 
@@ -82,59 +84,56 @@ events, a generic `backend` event is also triggered when a model is synced.
 The event prefix `backend` is used by default but this can be customized by setting the
 event name on the server.
 
-    backboneio.listen(app, { mybackend: new Backend() }, { event: 'myevent' });
+    backboneio.listen(app, { mybackend: backend }, { event: 'myevent' });
 
-Backends
---------
+Backends and Middleware
+-----------------------
 
-A backend is an object that exposes four functions, `create`, `read`, `update`, and `delete`,
-corresponding to the methods of `Backbone.sync`.  Each function takes a model object and a
-callback.  For example, a backend that interacts with a database might look something like this:
+Backends are stacks of composable middleware (inspired by Connect) that are responsible
+for handling sync requests and responding appropriately.  Each middleware is a function
+that accepts request and response objects (and optionally a function that can be called
+to continue down the stack).  A middleware will generally either return a result by
+calling `end` on the response object or pass control downward.  For example, let's add a
+logger middleware to our backend:
 
-    var MyBackend = {
-        create: function(model, callback) {
-            db.insert(model, function(err, record) {
-                // The returned record must have an `id`
-                // attribute defined.
-                callback(err, record);
-            });
-        },
-        
-        read: function(model, callback) {
-            if (model.id) {
-                // When an `id` is present, return single record
-                db.findOne({ id: model.id }, function(err, record) {
-                    callback(err, record);
-                });
-            } else {
-                // Otherwise return all records
-                db.find({}, function(err, records) {
-                    callback(err, records);
-                });
-            }
-        },
-        
-        update: function(model, callback) {
-            db.update({ id: model.id }, model, function(err) {
-                // Return the updated model
-                callback(err, model);
-            });
-        },
-        
-        delete: function(model, callback) {
-            db.delete({ id: model.id }, function(err) {
-                // Return the deleted model
-                callback(err, model);
-            });
+    var backend = backboneio.createBackend();
+    
+    backend.use(function(req, res, next) {
+        console.log(req.backend);
+        console.log(req.method);
+        console.log(JSON.stringify(req.model));
+        next();
+    });
+    
+    backend.use(backboneio.middleware.memoryStore());
+    
+Middleware can also be applied to only particular types of requests by passing the desired
+contexts to `use`:
+
+    backend.use('create', 'update', 'delete', function(req, res, next) {
+        if (isAuthorized(req)) {
+            next();
+        } else {
+            next(new Error('Unauthorized'));
         }
-    };
+    });
     
-One can then use the custom backend like so:
+Or alternatively by using one of the four helper methods (`create`, `read`, `update`, `delete`):
 
-    backboneio.listen(app, { mybackend: MyBackend });
+    backend.read(function(req, res) {
+        if (req.model.id) {
+            req.end(mymodels[req.model.id]);
+        } else {
+            req.end(mymodels);
+        }
+    });
     
-Further Customizations
-----------------------
+If the bottom of the middleware stack is reached before a result is returned then the requested
+model is returned by default: `res.end(req.model)`.
+    
+Customizing
+-----------
 
-Since the call to `listen` returns the Socket.IO object, it can be manipulated beyond the
-basics of Backbone.IO.
+In addition to middleware, the behavior of Backbone.IO can be customized via standard Socket.IO
+mechanisms.  The object returned from the call to `listen` is the Socket.IO object and can be
+manipulated further.  See http://socket.io for more details.
