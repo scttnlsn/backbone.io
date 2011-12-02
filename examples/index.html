@@ -7,7 +7,7 @@
     <script src="/socket.io/backbone.io.js"></script>
     
     <script>
-        var Message = Backbone.Model.extend();
+        var Message = Backbone.Model.extend({});
     
         var Messages = Backbone.Collection.extend({
             
@@ -23,17 +23,46 @@
             }
         
         });
+        
+        var MessageView = Backbone.View.extend({
+            
+            tagName: 'li',
+            
+            events: {
+                'click .delete': 'delete'
+            },
+            
+            initialize: function() {
+                _.bindAll(this, 'render', 'delete');
+                
+                this.template = _.template($('#message-template').html());
+            },
+            
+            render: function() {
+                $(this.el).html(this.template(this.model.toJSON()));
+                return this;
+            },
+            
+            delete: function(e) {
+                e.preventDefault();
+                this.model.destroy();
+            }
+            
+        });
     
         var MessagesView = Backbone.View.extend({
         
             events: {
-                'click .send': 'send'
+                'click .send': 'send',
+                'keypress .message': 'keypress'
             },
         
             initialize: function(options) {
-                _.bindAll(this, 'render', 'send');
+                _.bindAll(this, 'render', 'send', 'keypress');
             
                 this.collection.bind('add', this.render);
+                this.collection.bind('change', this.render);
+                this.collection.bind('remove', this.render);
                 this.collection.bind('reset', this.render);
                 this.collection.fetch();
                 
@@ -44,7 +73,8 @@
                 $(this.el).html(this.template());
                 
                 this.collection.each(function(message) {
-                    this.$('ul').append($('<li>', { html: message.get('text') }));
+                    var view = new MessageView({ model: message });
+                    this.$('ul').append(view.render().el);
                 });
                 
                 return this;
@@ -53,19 +83,29 @@
             send: function() {
                 this.collection.create({ text: this.$('.message').val() });
                 this.$('.message').val('');
+            },
+            
+            keypress: function(e) {
+                if (e.which === 13) this.send();
             }
         
         });
         
         $(function() {
-            new MessagesView({ el: $('#messages'), collection: new Messages() }).render();
+            window.messages = new Messages();
+            new MessagesView({ el: $('#messages'), collection: messages }).render();
         });
     </script>
     
+    <script id="message-template" type="text/template">
+        <%= text %>
+        <a class="delete" href="#">[x]</a>
+    </script>
+    
     <script id="messages-template" type="text/template">
-        <ul></ul>
         <input class="message" type="text">
         <input class="send" type="submit" value="Send">
+        <ul></ul>
     </script>
 </head>
 <body>

@@ -7,5 +7,7 @@ app.use(express.static(__dirname));
 app.listen(3000);
 console.log('http://localhost:3000/');
 
-var Backend = require('../backends/memory');
-backboneio.listen(app, { messages: new Backend() });
+var messages = backboneio.createBackend();
+messages.use(backboneio.middleware.memoryStore());
+
+backboneio.listen(app, { messages: messages });
