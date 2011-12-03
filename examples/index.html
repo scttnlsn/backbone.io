@@ -7,7 +7,15 @@
     <script src="/socket.io/backbone.io.js"></script>
     
     <script>
-        var Message = Backbone.Model.extend({});
+        var Message = Backbone.Model.extend({
+            
+            initialize: function() {
+                this.bind('error', function(model, err) {
+                    alert(err.message);
+                });
+            }
+            
+        });
     
         var Messages = Backbone.Collection.extend({
             
