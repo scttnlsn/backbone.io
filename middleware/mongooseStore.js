@@ -1,9 +1,9 @@
 var _ = require('underscore');
 
 module.exports = function(Model) {
-    return function(req, res) {
+    return function(req, res, next) {
         var callback = function(err, result) {
-            if (err) throw err;
+            if (err) return next(err);
             res.end(result);
         };
         
@@ -25,19 +25,20 @@ module.exports = function(Model) {
                 delete model._id;
                 
                 Model.update({ _id: req.model._id }, { '$set': model }, function(err) {
-                    if (err) throw err;
+                    if (err) return next(err);
                     res.end(req.model);
                 });
             },
             
             delete: function() {
                 Model.remove({ _id: req.model._id }, function(err) {
-                    if (err) throw err;
+                    if (err) return next(err);
                     res.end(req.model);
                 });
             }
         };
         
+        if (!crud[req.method]) return next(new Error('Unsuppored method ' + req.method));
         crud[req.method]();
     }
 };
