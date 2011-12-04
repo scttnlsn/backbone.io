@@ -7,10 +7,14 @@ module.exports = function(options) {
     return function(req, res, next) {
         req.sessionID = req.cookies[options.key];
         
-        options.store.get(req.sessionID, function(err, session) {
-            if (err) return next(err);
-            req.session = session;
+        if (req.sessionID) {
+            options.store.get(req.sessionID, function(err, session) {
+                if (err) return next(err);
+                req.session = session;
+                next();
+            });
+        } else {
             next();
-        });
+        }
     };
 };
