@@ -1,7 +1,7 @@
 Backbone.IO
 ===========
 
-Storage-agnostic Backbone.js sync override and server notifications via Socket.IO.
+Backend-agnostic Backbone.js sync override and server notifications via Socket.IO.
 
 Install
 -------
@@ -129,7 +129,8 @@ Or alternatively by using one of the four helper methods (`create`, `read`, `upd
     });
     
 If the bottom of the middleware stack is reached before a result is returned then the requested
-model is returned by default: `res.end(req.model)`.
+model is returned by default: `res.end(req.model)`.  Look in the `middleware` directory for more
+examples.
     
 Customizing
 -----------
