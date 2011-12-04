@@ -1,5 +1,3 @@
-var _ = require('underscore');
-
 module.exports = function(Model) {
     return function(req, res, next) {
         var callback = function(err, result) {
@@ -21,7 +19,10 @@ module.exports = function(Model) {
             },
             
             update: function() {
-                var model = _.clone(req.model);
+                var model = {};
+                for (var key in req.model) {
+                    model[key] = req.model[key];
+                }
                 delete model._id;
                 
                 Model.update({ _id: req.model._id }, { '$set': model }, function(err) {

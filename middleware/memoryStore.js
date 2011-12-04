@@ -1,13 +1,12 @@
-var _ = require('underscore');
-
 module.exports = function() {
     var models = {};
+    var id = 1;
     
     return function(req, res, next) {
         var crud = {
             create: function() {
                 var model = req.model;
-                model.id = _.uniqueId('s');
+                model.id = id++;
                 models[model.id] = model;
                 res.end(model);
             },
@@ -16,7 +15,11 @@ module.exports = function() {
                 if (req.model.id) {
                     res.end(models[req.model.id]);
                 } else {
-                    res.end(_.values(models));
+                    var values = [];
+                    for (var id in models) {
+                        values.push(models[id])
+                    }
+                    res.end(values);
                 }
             },
             
