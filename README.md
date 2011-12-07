@@ -37,7 +37,7 @@ On the client:
         });
     </script>
     
-Models in `TestCollection` will now be synced to `mybackend`.
+Models in `MyCollection` will now be synced to `mybackend`.
 
 Events
 ------
