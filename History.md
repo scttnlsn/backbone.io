@@ -1,3 +1,8 @@
+0.2.2 / 2011-12-07
+==================
+
+* Fixed backend binding to only update models that are present in a collection
+
 0.2.1 / 2011-12-07
 ==================
 
