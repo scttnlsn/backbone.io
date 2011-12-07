@@ -1,3 +1,10 @@
+0.2.1 / 2011-12-07
+==================
+
+* Added support for explicit backend notifications
+* Added `options` object to request
+* Removed client notification of `read` requests
+
 0.2.0 / 2011-12-03
 ==================
 
