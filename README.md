@@ -85,20 +85,6 @@ The event prefix `backend` is used by default but this can be customized by sett
 event name on the server.
 
     backboneio.listen(app, { mybackend: backend }, { event: 'myevent' });
-    
-Clients are automatically notified of events triggered by other clients, however, there may
-be cases where other server-side code needs to make updates to a model outside of a backend
-handler.  In such a case, one can notify clients by emitting events directly on the backend.
-For example:
-
-    var backend = backboneio.createBackend();
-    backend.use(backboneio.middleware.memoryStore());
-    
-    // Clients will receive 'backend:create', 'backend:update',
-    // and 'backend:delete' events respectively.
-    backend.emit('created', { id: 'myid', foo: 'bar' });
-    backend.emit('updated', { id: 'myid', foo: 'baz' });
-    backend.emit('deleted', { id: 'myid' });
 
 Backends and Middleware
 -----------------------
@@ -120,6 +106,15 @@ logger middleware to our backend:
     });
     
     backend.use(backboneio.middleware.memoryStore());
+    
+A request object will contain the following components (in addition to those set by
+various middleware):
+
+* `method`: the sync method (`create`, `read`, `update`, or `delete`)
+* `model`: the model object to by synced
+* `options`: any options set by the client (except success and error callbacks)
+* `backend`: name of the backend responsible for handling the request
+* `socket`: the client socket that initiated the request
     
 Middleware can also be applied to only particular types of requests by passing the desired
 contexts to `use`:
@@ -146,13 +141,19 @@ If the bottom of the middleware stack is reached before a result is returned the
 model is returned by default: `res.end(req.model)`.  Look in the `middleware` directory for more
 examples.
 
-A request object contains the following components:
+Clients are automatically notified of events triggered by other clients, however, there may
+be cases where other server-side code needs to make updates to a model outside of a backend
+handler.  In such a case, one can notify clients by emitting events directly on the backend.
+For example:
 
-* `method`: the sync method (`create`, `read`, `update`, or `delete`)
-* `model`: the model object to by synced
-* `options`: any options set by the client (except success and error callbacks)
-* `backend`: name of the backend responsible for handling the request
-* `socket`: the client socket that initiated the request
+    var backend = backboneio.createBackend();
+    backend.use(backboneio.middleware.memoryStore());
+    
+    // Clients will receive 'backend:create', 'backend:update',
+    // and 'backend:delete' events respectively.
+    backend.emit('created', { id: 'myid', foo: 'bar' });
+    backend.emit('updated', { id: 'myid', foo: 'baz' });
+    backend.emit('deleted', { id: 'myid' });
     
 Customizing
 -----------
