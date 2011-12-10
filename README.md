@@ -161,3 +161,8 @@ Customizing
 In addition to middleware, the behavior of Backbone.IO can be customized via standard Socket.IO
 mechanisms.  The object returned from the call to `listen` is the Socket.IO object and can be
 manipulated further.  See http://socket.io for more details.
+
+Tests
+-----
+
+    vows --spec test/*
