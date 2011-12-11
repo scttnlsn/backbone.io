@@ -17,7 +17,7 @@
     
     "devDependencies": {
         "express": ">= 2.5.0",
-        "sinon": ">= 1.2.0",
-        "vows": ">= 0.6.0"
+        "mocha": ">= 0.3.6",
+        "sinon": ">= 1.2.0"
     }
 }

@@ -1,76 +1,69 @@
 var assert = require('assert');
 var sinon = require('sinon');
-var vows = require('vows');
 var Sync = require('../lib/sync');
 
-exports.suite = vows.describe('Sync').addBatch({
-    'A sync object': {
-        topic: function() {
-            return new Sync('backend', 'socket');
-        },
-        
-        'when handling a request': {
-            topic: function(sync) {
-                var handle = sinon.spy();
-                var backend = { handle: handle };
-                var req = { foo: 'bar' };
-                
-                sync.handle(backend, req, function() {});
-                return handle;
-            },
-            
-            'delegates to the backend': function(handle) {
-                assert.isTrue(handle.calledOnce);
-            },
-            
-            'includes backend and socket in the request': function(handle) {
-                var call = handle.getCall(0);
-                var req = call.args[0];
-                
-                assert.equal(req.backend, 'backend');
-                assert.equal(req.socket, 'socket');
-                assert.equal(req.foo, 'bar');
-            }
-        },
-        
-        'when handling a successful request': {
-            topic: function(sync) {
-                var backend = {
-                    handle: function(req, res, callback) {
+describe('Sync', function() {
+    var backend, callback, handle, sync;
+    
+    describe('#handle', function() {
+        beforeEach(function() {
+            backend = {
+                handle: function(req, res) {
+                    if (req.error) {
+                        res.error(new Error('bar'));
+                    } else {
                         res.end('foo');
-                        
-                        // Should be ignored
-                        res.end('bar');
-                        res.error('baz');
                     }
+                    
+                    // Should be ignored
+                    res.end('baz');
+                    res.error('qux');
                 }
-                sync.handle(backend, {}, this.callback);
-            },
-            
-            'returns the result': function(err, result) {
-                assert.isNull(err);
-                assert.equal(result, 'foo');
-            }
-        },
+            };
+            callback = sinon.spy();
+            handle = sinon.spy(backend, 'handle');
+            sync = new Sync('backend', 'socket');
+        });
         
-        'when handling an errored request': {
-            topic: function(sync) {
-                var backend = {
-                    handle: function(req, res, callback) {
-                        res.error(new Error('foo'));
-                        
-                        // Should be ignored
-                        res.end('bar');
-                        res.error('baz');
-                    }
-                }
-                sync.handle(backend, {}, this.callback);
-            },
+        it('should delegate to the backend', function() {
+            sync.handle(backend, {}, callback);
             
-            'creates an error result': function(err, result) {
-                assert.equal(err.error, 'Error');
-                assert.equal(err.message, 'foo');
-            }
-        }
-    }
+            assert.ok(handle.calledOnce);
+        });
+        
+        it('should merge `backend` and `socket` into the request object', function() {
+            sync.handle(backend, { foo: 'bar' }, callback);
+            
+            var req = handle.getCall(0).args[0];
+            
+            assert.equal(req.backend, 'backend');
+            assert.equal(req.socket, 'socket');
+            assert.equal(req.foo, 'bar');
+        });
+        
+        it('should pass result to callback', function() {
+            sync.handle(backend, {}, callback);
+            
+            var call = callback.getCall(0);
+            var err = call.args[0];
+            var result = call.args[1];
+            
+            assert.ok(callback.called);
+            assert.equal(err, null);
+            assert.equal(result, 'foo');
+        });
+        
+        it('should pass error to callback', function() {
+            sync.handle(backend, { error: true }, callback);
+            
+            var call = callback.getCall(0);
+            var err = call.args[0];
+            var result = call.args[1];
+            
+            assert.ok(callback.called);
+            assert.equal(err.error, 'Error');
+            assert.equal(err.message, 'bar');
+            assert.equal(result, undefined);
+        });
+    });
 });

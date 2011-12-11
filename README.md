@@ -165,4 +165,10 @@ manipulated further.  See http://socket.io for more details.
 Tests
 -----
 
-    vows --spec test/*
+Install development dependencies:
+
+    npm install
+    
+Run the test suite:
+
+    make test

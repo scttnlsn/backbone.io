@@ -1,157 +1,133 @@
 var assert = require('assert');
 var sinon = require('sinon');
-var vows = require('vows');
 var Backend = require('../lib/backend');
 
-exports.suite = vows.describe('Backend').addBatch({
-    'A backend without middleware': {
-        topic: function() {
-            return new Backend();
-        },
-        
-        'when handling a request': {
-            topic: function(backend) {
-                var end = sinon.spy();
-                backend.handle({ method: 'foo', model: 'bar' }, { end: end });
-                return end;
-            },
-            
-            'results in the requested model': function(end) {
-                assert.isTrue(end.calledOnce);
-                
-                var call = end.getCall(0);
-                var args = end.args[0];
-                
-                assert.equal(args[0], 'bar');
-            }
-        }
-        
-    },
+describe('Backend', function() {
+    var backend;
     
-    'A backend with middleware': {
-        topic: function() {
-            var backend = new Backend();
-            backend.use('foo', sinon.spy());
-            backend.use('bar', sinon.spy());
+    beforeEach(function() {
+        backend = new Backend();
+    });
+    
+    describe('#use', function() {
+        it('applies middleware to all contexts by default', function() {
+            var middleware = sinon.spy();
+            
+            backend.use(middleware);
+            backend.handle({ method: 'foo' }, {});
+            
+            assert.ok(middleware.calledOnce);
+        });
+        
+        it('only calls middleware used for a given context', function() {
+            var middleware = sinon.spy();
+            
+            backend.use('bar', middleware);
             backend.use(sinon.spy());
-            return backend;
-        },
-        
-        'sets the contexts on the middleware layer': function(backend) {
-            assert.include(backend.stack[0].context, 'foo');
-            assert.include(backend.stack[1].context, 'bar');
-        },
-        
-        'uses all contexts when not specified': function(backend) {
-            assert.include(backend.stack[2].context, 'all');
-        },
-        
-        'when handling a request': {
-            topic: function(backend) {
-                backend.handle({ method: 'foo' }, {});
-                return backend
-            },
+            backend.handle({ method: 'foo' }, {});
             
-            'calls only the applicable layers': function(backend) {
-                assert.isTrue(backend.stack[0].middleware.calledOnce);
-                assert.isFalse(backend.stack[1].middleware.called);
-            }
-        }
-    },
-    
-    'A backend with multiple middleware layers': {
-        topic: function() {
-            var backend = new Backend();
+            assert.equal(middleware.callCount, 0);
+        });
+        
+        it('accepts multiple contexts', function() {
+            var middleware = sinon.spy();
+            
+            backend.use('bar', 'baz', middleware);
+            backend.use(sinon.spy());
+            backend.handle({ method: 'foo' }, {});
+            backend.handle({ method: 'bar' }, {});
+            backend.handle({ method: 'baz' }, {});
+            
+            assert.ok(middleware.calledTwice);
+        });
+        
+        it('chains middleware in the order used', function() {
+            var first = sinon.spy();
+            var second = sinon.spy();
+            var third = sinon.spy();
+            var fourth = sinon.spy();
+            
             backend.use(function(req, res, next) {
+                first();
                 next();
             });
             backend.use(function(req, res, next) {
+                second();
                 next();
             });
-            backend.use(sinon.spy());
-            return backend;
-        },
-        
-        'when handling a request': {
-            topic: function(backend) {
-                backend.handle({ method: 'foo' }, {});
-                return backend
-            },
-            
-            'passes control down the stack': function(backend) {
-                assert.isTrue(backend.stack[2].middleware.calledOnce);
-            }
-        }
-    },
-    
-    'A backend that throws an error': {
-        topic: function() {
-            var backend = new Backend();
             backend.use(function(req, res, next) {
-                throw new Error('foo');
+                third();
             });
-            return backend;
-        },
-        
-        'when handling a request': {
-            topic: function(backend) {
-                backend.handle({ method: 'bar' }, {}, this.callback);
-            },
-            
-            'passes err to callback': function(err, result) {
-                assert.isNotNull(err);
-            }
-        }
-    },
-    
-    'A backend that passes an error': {
-        topic: function() {
-            var backend = new Backend();
             backend.use(function(req, res, next) {
-                next(new Error('foo'));
+                fourth();
             });
-            return backend;
-        },
-        
-        'when handling a request': {
-            topic: function(backend) {
-                backend.handle({ method: 'bar' }, {}, this.callback);
-            },
+            backend.handle({ method: 'foo' }, {});
             
-            'results in an error': function(err, result) {
-                assert.isNotNull(err);
-                assert.equal(err.message, 'foo');
-            }
-        }
-    },
+            assert.ok(first.calledOnce);
+            assert.ok(first.calledBefore(second));
+            assert.ok(second.calledOnce);
+            assert.ok(second.calledBefore(third));
+            assert.ok(third.calledOnce);
+            assert.ok(third.calledBefore(fourth));
+            assert.ok(!fourth.called);
+        });
+    });
     
-    'A backend that accepts an error': {
-        topic: function() {
-            var backend = new Backend();
+    describe('#handle', function() {
+        it('returns the requested model by default', function() {
+            var end = sinon.spy();
+            
+            backend.handle({ method: 'foo', model: 'bar' }, { end: end });
+            
+            var result = end.getCall(0).args[0];
+            
+            assert.ok(end.calledOnce);
+            assert.equal(result, 'bar');
+        });
+        
+        it('passes `req`, `res` and `next` to middleware', function() {
+            var middleware = sinon.spy();
+            
+            backend.use(middleware);
+            backend.handle({ method: 'foo' }, { bar: 'baz' });
+            
+            var args = middleware.getCall(0).args;
+            
+            assert.ok(middleware.calledOnce);
+            assert.equal(args[0].method, 'foo');
+            assert.equal(args[1].bar, 'baz');
+            assert.equal(typeof args[2], 'function');
+        });
+        
+        it('passes uncaught errors to callback', function() {
+            var callback = sinon.spy();
+            
             backend.use(function(req, res, next) {
-                next(new Error('foo'));
+                throw new Error('bar');
+            });
+            backend.handle({ method: 'foo' }, {}, callback);
+            
+            var err = callback.getCall(0).args[0];
+            
+            assert.ok(callback.calledOnce);
+            assert.equal(err.message, 'bar');
+        });
+        
+        it('passes uncaught errors to accepting middleware', function() {
+            var spy = sinon.spy();
+            
+            backend.use(function(req, res, next) {
+                throw new Error('bar');
             });
             backend.use(function(err, req, res, next) {
-                res.end(err.message);
+                spy(err);
             });
-            return backend;
-        },
-        
-        'when handling a request': {
-            topic: function(backend) {
-                var end = sinon.spy();
-                backend.handle({ method: 'bar' }, { end: end });
-                return end;
-            },
+            backend.handle({ method: 'foo' }, {});
             
-            'does not result in an error': function(end) {
-                assert.isTrue(end.calledOnce);
-                
-                var call = end.getCall(0);
-                var args = end.args[0];
-                
-                assert.equal(args[0], 'foo');
-            }
-        }
-    }
+            var err = spy.getCall(0).args[0];
+            
+            assert.ok(spy.calledOnce);
+            assert.equal(err.message, 'bar');
+        });
+    });
 });
