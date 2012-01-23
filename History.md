@@ -1,3 +1,8 @@
+0.2.3 / 2012-01-23
+==================
+
+* Fixed `Backbone.sync` for models with no collection or backend
+
 0.2.2 / 2011-12-07
 ==================
 
