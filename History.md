@@ -1,3 +1,8 @@
+0.2.4 / 2012-02-22
+==================
+
+* Fixed problem with success/error callbacks being deleted from save options
+
 0.2.3 / 2012-01-23
 ==================
 
