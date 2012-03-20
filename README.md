@@ -154,6 +154,20 @@ For example:
     backend.emit('created', { id: 'myid', foo: 'bar' });
     backend.emit('updated', { id: 'myid', foo: 'baz' });
     backend.emit('deleted', { id: 'myid' });
+
+Channels
+--------
+
+To synchronize changes only among a subset of all clients sharing a single backend, you can
+specify a channel.
+
+    var MyCollection = Backbone.Collection.extend({
+        
+        backend: { name: 'mybackend', channel: 'mychannel' }
+        
+    });
+
+Only clients sharing the same channel will receive updates from each other.
     
 Customizing
 -----------
