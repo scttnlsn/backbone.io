@@ -158,7 +158,7 @@ For example:
 Channels
 --------
 
-To synchronize changes only among a subset of all clients sharing a single backend, you can
+To synchronize models between a subset of all clients sharing a single backend, you can
 specify a channel.
 
     var MyCollection = Backbone.Collection.extend({
@@ -167,7 +167,8 @@ specify a channel.
         
     });
 
-Only clients sharing the same channel will receive updates from each other.
+Only clients sharing the same channel will receive updates from each other.  The channel
+associated with a given request is available from any middleware in `req.channel`.
     
 Customizing
 -----------
