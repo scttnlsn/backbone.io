@@ -89,7 +89,7 @@
             },
         
             send: function() {
-                this.collection.create({ text: this.$('.message').val() });
+                this.collection.create({ text: this.$('.message').val() }, { wait: true });
                 this.$('.message').val('');
             },
             
