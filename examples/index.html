@@ -10,8 +10,8 @@
         var Message = Backbone.Model.extend({
             
             initialize: function() {
-                this.bind('error', function(model, err) {
-                    alert(err.message);
+                this.bind('error', function(model, res) {
+                    alert(res.error.message);
                 });
             }
             
