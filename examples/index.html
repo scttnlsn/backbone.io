@@ -10,7 +10,7 @@
         var Message = Backbone.Model.extend({
             
             initialize: function() {
-                this.bind('error', function(model, res) {
+                this.on('error', function(model, res) {
                     alert(res.error.message);
                 });
             }
@@ -41,8 +41,6 @@
             },
             
             initialize: function() {
-                _.bindAll(this, 'render', 'delete');
-                
                 this.template = _.template($('#message-template').html());
             },
             
@@ -66,14 +64,7 @@
             },
         
             initialize: function(options) {
-                _.bindAll(this, 'render', 'send', 'keypress');
-            
-                this.collection.bind('add', this.render);
-                this.collection.bind('change', this.render);
-                this.collection.bind('remove', this.render);
-                this.collection.bind('reset', this.render);
-                this.collection.fetch();
-                
+                this.collection.on('add change remove reset', this.render, this);
                 this.template = _.template($('#messages-template').html());
             },
         
@@ -101,6 +92,7 @@
         
         $(function() {
             window.messages = new Messages();
+            window.messages.fetch();
             new MessagesView({ el: $('#messages'), collection: messages }).render();
         });
     </script>
