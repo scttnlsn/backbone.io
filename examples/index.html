@@ -7,6 +7,8 @@
     <script src="/socket.io/backbone.io.js"></script>
     
     <script>
+        Backbone.io.connect();
+
         var Message = Backbone.Model.extend({
             
             initialize: function() {
