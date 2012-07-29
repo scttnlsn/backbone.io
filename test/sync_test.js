@@ -61,8 +61,10 @@ describe('Sync', function() {
             var result = call.args[1];
             
             assert.ok(callback.called);
-            assert.equal(err.error, 'Error');
-            assert.equal(err.message, 'bar');
+            assert.ok(err);
+            assert.ok(err.error);
+            assert.equal(err.error.name, 'Error');
+            assert.equal(err.error.message, 'bar');
             assert.equal(result, undefined);
         });
     });
