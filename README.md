@@ -32,12 +32,17 @@ On the client:
     <script src="/socket.io/backbone.io.js"></script>
     
     <script>
+        Backbone.io.connect();
+
         var MyCollection = Backbone.Collection.extend({
             backend: 'mybackend'
         });
     </script>
     
 Models in `MyCollection` will now be synced to `mybackend`.
+
+Note that as of 0.3.x, one must explicitly call `Backbone.io.connect`.  Any
+optional arguments will be passed to Socket.IO's `io.connect` function.
 
 Events
 ------
