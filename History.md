@@ -1,3 +1,10 @@
+0.3.0 / 2012-07-29
+==================
+
+* Added all error properties to sync response
+* Changed client to require explicit `connect` call
+* Fixed deletion of success/error callbacks during normal `sync`
+
 0.2.7 / 2012-04-09
 ==================
 
