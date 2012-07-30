@@ -8,8 +8,9 @@ module.exports = function(options) {
         req.sessionID = req.cookies[options.key];
         
         if (req.sessionID) {
-            options.store.get(req.sessionID, function(err, session) {
+            options.store.load(req.sessionID, function(err, session) {
                 if (err) return next(err);
+                if (!session) return next(new Error('Session not found'));
                 req.session = session;
                 next();
             });
