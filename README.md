@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/scttnlsn/backbone.io.png)](http://travis-ci.org/scttnlsn/backbone.io)
 Backbone.IO
 ===========
 
