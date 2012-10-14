@@ -136,9 +136,9 @@ Or alternatively by using one of the four helper methods (`create`, `read`, `upd
 
     backend.read(function(req, res) {
         if (req.model.id) {
-            req.end(mymodels[req.model.id]);
+            res.end(mymodels[req.model.id]);
         } else {
-            req.end(mymodels);
+            res.end(mymodels);
         }
     });
     
