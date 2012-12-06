@@ -9,10 +9,9 @@ module.exports = function(dbname, colname) {
 
     db.open(function(err, db) {
         if(!err) {
-            console.log("Connected to '" + dbname + "' database for (" + colname + ").");
             db.collection(colname, {safe:true}, function(err, collection) {
                 if (err) {
-                    console.log("The '" + colname + "' collection doesn't exist.");
+                    console.warn(err);
                 }
             });
         }
@@ -27,13 +26,11 @@ module.exports = function(dbname, colname) {
         var crud = {
             create: function() {
                 var item = req.model;
-                console.log('Adding ' + dbname + ':' + colname + ' item: ' + JSON.stringify(item));
                 db.collection(colname, function(err, collection) {
                     collection.insert(item, {safe:true}, function(err, result) {
                         if (err) {
-                            res.end({'error':'An error has occurred'});
+                            res.end({'error':'An error has occurred' + err});
                         } else {
-                            console.log('Success: ' + JSON.stringify(result[0]));
                             res.end(result[0]);
                         }
                     });
@@ -43,7 +40,6 @@ module.exports = function(dbname, colname) {
             read: function() {
                 if (req.model._id) {
                     var id = req.model._id;
-                    console.log('Retrieving ' + dbname + ':' + colname + ' item: ' + id);
                     db.collection(colname, function(err, collection) {
                         collection.findOne({'_id': id}, function(err, item) {
                             res.end(item);
@@ -67,15 +63,13 @@ module.exports = function(dbname, colname) {
 
                 var id = req.model._id;
 
-                console.log('Updating ' + dbname + ':' + colname + ' item: ' + id);
                 console.log(JSON.stringify(item));
                 db.collection(colname, function(err, collection) {
                     collection.update({'_id': id}, item, {safe:true}, function(err, result) {
                         if (err) {
                             console.log('Error updating ' + dbname + ':' + colname + ' item: ' + err);
-                            res.end({'error':'An error has occurred'});
+                            res.end({'error':'An error has occurred' + err});
                         } else {
-                            console.log('' + result + ' document(s) updated');
                             res.end(item);
                         }
                     });
@@ -84,13 +78,11 @@ module.exports = function(dbname, colname) {
 
             delete: function() {
                 var id = req.model._id;
-                console.log('Deleting ' + dbname + ':' + colname + ' item: ' + id);
                 db.collection(colname, function(err, collection) {
                     collection.remove({'_id': id}, {safe:true}, function(err, result) {
                         if (err) {
                             res.end({'error':'An error has occurred - ' + err});
                         } else {
-                            console.log('' + result + ' document(s) deleted');
                             res.end(req.model);
                         }
                     });
