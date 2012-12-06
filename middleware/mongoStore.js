@@ -1,21 +1,28 @@
-module.exports = function(dbname, colname) {
+module.exports = function(db, colname) {
     var mongo = require('mongodb');
 
-    var Server = mongo.Server,
-    Db = mongo.Db;
+    if (typeof db == "string") {
+        var Server = mongo.Server,
+        Db = mongo.Db;
 
-    var server = new Server('localhost', 27017, {auto_reconnect: true});
-    db = new Db(dbname, server, {safe: true});
+        var server = new Server('localhost', 27017, {auto_reconnect: true});
+        db = new Db(db, server, {safe: true});
+    } else if (! db instanceof mongo.Db) {
+        console.error ("db must be a mongo.Db or a string.");
+        return new Error("wrong db object");
+    }
 
-    db.open(function(err, db) {
-        if(!err) {
-            db.collection(colname, {safe:true}, function(err, collection) {
-                if (err) {
-                    console.warn(err);
-                }
-            });
-        }
-    });
+    if (db.state == 'disconnected') {
+        db.open(function(err, db) {
+            if(!err) {
+                db.collection(colname, {safe:true}, function(err, collection) {
+                    if (err) {
+                        console.warn(err);
+                    }
+                });
+            }
+        });
+    }
 
     return function(req, res, next) {
         var callback = function(err, result) {
