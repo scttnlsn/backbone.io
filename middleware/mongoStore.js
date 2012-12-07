@@ -2,6 +2,7 @@ module.exports = function(db, colname) {
     var Promise = require('../lib/promise');
     var mongo = require('mongodb');
 
+    var self = this;
     if (typeof db == "string") {
         var Server = mongo.Server,
         Db = mongo.Db;
@@ -25,9 +26,8 @@ module.exports = function(db, colname) {
         });
     }
 
-    this.collection = new Promise();
-    db.collection(colname, this.collection.resolve.bind(this.collection));
-
+    self.collection = new Promise();
+    db.collection(colname, self.collection.resolve.bind(self.collection));
 
     return function(req, res, next) {
         var callback = function(err, result) {
@@ -38,7 +38,7 @@ module.exports = function(db, colname) {
         var crud = {
             create: function() {
                 var item = req.model;
-                this.collection.then(function(err, collection) {
+                self.collection.then(function(err, collection) {
                     collection.insert(item, {safe:true}, function(err, result) {
                         if (err) {
                             res.end({'error':'An error has occurred' + err});
@@ -52,13 +52,13 @@ module.exports = function(db, colname) {
             read: function() {
                 if (req.model._id) {
                     var id = req.model._id;
-                    this.collection.then(function(err, collection) {
+                    self.collection.then(function(err, collection) {
                         collection.findOne({'_id': id}, function(err, item) {
                             res.end(item);
                         });
                     });
                 } else {
-                    this.collection.then(function(err, collection) {
+                    self.collection.then(function(err, collection) {
                         collection.find().toArray(function(err, items) {
                             res.end(items);
                         });
@@ -76,7 +76,7 @@ module.exports = function(db, colname) {
                 var id = req.model._id;
 
                 console.log(JSON.stringify(item));
-                this.collection.then(function(err, collection) {
+                self.collection.then(function(err, collection) {
                     collection.update({'_id': id}, item, {safe:true}, function(err, result) {
                         if (err) {
                             console.log('Error updating ' + dbname + ':' + colname + ' item: ' + err);
@@ -90,7 +90,7 @@ module.exports = function(db, colname) {
 
             delete: function() {
                 var id = req.model._id;
-                this.collection.then(function(err, collection) {
+                self.collection.then(function(err, collection) {
                     collection.remove({'_id': id}, {safe:true}, function(err, result) {
                         if (err) {
                             res.end({'error':'An error has occurred - ' + err});
