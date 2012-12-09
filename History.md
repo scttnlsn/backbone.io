@@ -2,7 +2,7 @@
 ==================
 
 * Fixed middleware error handling bug
-* Changed session middleware to use `get` instead of `load`
+* Changed session middleware to use `load` instead of `get`
 * Fixed sync override to return original jqXHR object
 
 0.3.1 / 2012-07-29
