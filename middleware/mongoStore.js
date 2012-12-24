@@ -1,33 +1,16 @@
 module.exports = function(db, colname) {
-    var Promise = require('../lib/promise');
-    var mongo = require('mongodb');
+    var mongo = require('mongoskin');
 
     var self = this;
     if (typeof db == "string") {
-        var Server = mongo.Server,
-        Db = mongo.Db;
-
-        var server = new Server('localhost', 27017, {auto_reconnect: true});
-        db = new Db(db, server, {safe: true});
+        var db = mongo.db('localhost:27017/' + db + '?auto_reconnect', {safe:true});
     } else if (! db instanceof mongo.Db) {
         console.error ("db must be a mongo.Db or a string.");
         return new Error("wrong db object");
     }
 
-    if (db.state == 'disconnected') {
-        db.open(function(err, db) {
-            if(!err) {
-                db.collection(colname, {safe:true}, function(err, collection) {
-                    if (err) {
-                        console.warn(err);
-                    }
-                });
-            }
-        });
-    }
-
-    self.collection = new Promise();
-    db.collection(colname, self.collection.resolve.bind(self.collection));
+    // cache up all this, it's just syntactical
+    var collection = db.collection(colname);
 
     return function(req, res, next) {
         var callback = function(err, result) {
@@ -38,30 +21,33 @@ module.exports = function(db, colname) {
         var crud = {
             create: function() {
                 var item = req.model;
-                self.collection.then(function(err, collection) {
-                    collection.insert(item, {safe:true}, function(err, result) {
-                        if (err) {
-                            res.end({'error':'An error has occurred' + err});
-                        } else {
-                            res.end(result[0]);
-                        }
-                    });
+                collection.insert(item, {safe:true}, function(err, result) {
+                    if (err) {
+                        res.end({'error':'An error has occurred on create ' + err});
+                    } else {
+                        res.end(result[0]);
+                    }
                 });
             },
 
             read: function() {
+                console.log ('READ', req);
                 if (req.model._id) {
                     var id = req.model._id;
-                    self.collection.then(function(err, collection) {
-                        collection.findOne({'_id': id}, function(err, item) {
+                    collection.findOne({'_id': id}, function(err, item) {
+                        if (err) {
+                            res.end({'error':'An error has occurred on read ' + err});
+                        } else {
                             res.end(item);
-                        });
+                        }
                     });
                 } else {
-                    self.collection.then(function(err, collection) {
-                        collection.find().toArray(function(err, items) {
+                    collection.find().toArray(function(err, items) {
+                        if (err) {
+                            res.end({'error':'An error has occurred on read ' + err});
+                        } else {
                             res.end(items);
-                        });
+                        }
                     });
                 }
             },
@@ -76,28 +62,23 @@ module.exports = function(db, colname) {
                 var id = req.model._id;
 
                 console.log(JSON.stringify(item));
-                self.collection.then(function(err, collection) {
-                    collection.update({'_id': id}, item, {safe:true}, function(err, result) {
-                        if (err) {
-                            console.log('Error updating ' + dbname + ':' + colname + ' item: ' + err);
-                            res.end({'error':'An error has occurred' + err});
-                        } else {
-                            res.end(item);
-                        }
-                    });
+                collection.update({'_id': id}, item, {safe:true}, function(err, result) {
+                    if (err) {
+                        res.end({'error':'An error has occurred on update ' + err});
+                    } else {
+                        res.end(item);
+                    }
                 });
             },
 
             delete: function() {
                 var id = req.model._id;
-                self.collection.then(function(err, collection) {
-                    collection.remove({'_id': id}, {safe:true}, function(err, result) {
-                        if (err) {
-                            res.end({'error':'An error has occurred - ' + err});
-                        } else {
-                            res.end(req.model);
-                        }
-                    });
+                collection.remove({'_id': id}, {safe:true}, function(err, result) {
+                    if (err) {
+                        res.end({'error':'An error has occurred on delete' + err});
+                    } else {
+                        res.end(req.model);
+                    }
                 });
             }
         };
