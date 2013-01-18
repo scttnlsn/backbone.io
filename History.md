@@ -1,8 +1,8 @@
 0.3.3 / 2013-01-18
 ==================
 
-* Added IE compatability
-* Added Backbone 0.9.10 compatability
+* Added IE compatibility
+* Added Backbone 0.9.10 compatibility
 
 0.3.2 / 2012-10-24
 ==================
