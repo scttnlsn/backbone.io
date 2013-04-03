@@ -12,6 +12,15 @@ module.exports = function(db, colname, options) {
     // cache up all this, it's just syntactical
     var collection = db.collection(colname);
 
+    var query_id = function(id) {
+        try {
+            return {$in: [id, mongo.ObjectID(id)]};
+        }
+        catch (e) {
+            return id;
+        }
+    };
+
     var ret = function(req, res, next) {
         var callback = function(err, result) {
             if (err) return next(err);
@@ -33,7 +42,7 @@ module.exports = function(db, colname, options) {
             read: function() {
                 console.log ('READ', req);
                 if (req.model._id) {
-                    var id = req.model._id;
+                    var id = query_id(req.model._id);
                     collection.findOne({'_id': id}, function(err, item) {
                         if (err) {
                             res.end({'error':'An error has occurred on read ' + err});
@@ -59,7 +68,7 @@ module.exports = function(db, colname, options) {
                 }
                 delete item._id;
 
-                var id = req.model._id;
+                var id = query_id(req.model._id);
 
                 collection.update({'_id': id}, item, {safe:true}, function(err, result) {
                     item['_id'] = req.model._id;
@@ -72,7 +81,7 @@ module.exports = function(db, colname, options) {
             },
 
             delete: function() {
-                var id = req.model._id;
+                var id = query_id(req.model._id);
                 collection.remove({'_id': id}, {safe:true}, function(err, result) {
                     if (err) {
                         res.end({'error':'An error has occurred on delete' + err});
