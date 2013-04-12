@@ -23,7 +23,8 @@ module.exports = function() {
             },
             
             delete: function() {
-                req.model = conf = {};
+                conf.resetRuntime();
+                req.model = conf;
                 res.end(req.model);
             }
         };
