@@ -23,9 +23,13 @@ module.exports = function() {
             },
 
             delete: function() {
-                conf.resetRuntime();
-                req.model = conf;
-                res.end(req.model);
+                conf.resetRuntime(function (err, written, buffer) {
+                    if(err) {
+                        return res.end({'error':'An error has occurred on delete' + err});
+                    }
+                    req.model = conf;
+                    res.end(req.model);
+                });
             }
         };
 
