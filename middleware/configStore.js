@@ -1,5 +1,5 @@
 module.exports = function() {
-    var conf = require('config');
+    var conf = require('mbc-common').config;
     var self = this;
 
     return function(req, res, next) {
