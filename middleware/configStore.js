@@ -1,4 +1,5 @@
 module.exports = function() {
+    var _ = require('underscore');
     var conf = require('mbc-common').config;
     var self = this;
 
@@ -11,14 +12,15 @@ module.exports = function() {
             },
 
             read: function() {
-                // Assing configuration from node-config module to models
-                req.model = conf;
+                // Assing configuration and defaults from node-config module to models
+                req.model[0] = _.extend(conf, {type: 'config'} );
+                req.model[1] = _.extend(conf.getOriginalConfig(), { type: 'defaults'} );
                 res.end(req.model);
             },
 
             update: function() {
                 // Assign req.model to node-config
-                conf._extendDeep(conf, req.model);
+                conf._extendDeep(conf, req.model[0]);
                 res.end(req.model)
             },
 
@@ -27,7 +29,7 @@ module.exports = function() {
                     if(err) {
                         return res.end({'error':'An error has occurred on delete' + err});
                     }
-                    req.model = conf;
+                    req.model[0] = conf;
                     res.end(req.model);
                 });
             }
