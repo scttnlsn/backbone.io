@@ -160,6 +160,13 @@ For example:
     backend.emit('updated', { id: 'myid', foo: 'baz' });
     backend.emit('deleted', { id: 'myid' });
 
+Optionally the "channel" can be used to trigger events to a subset of clients.
+
+    backend.emit('created', { id: 'myid', foo: 'bar' }, "mychannel");
+    backend.emit('updated', { id: 'myid', foo: 'baz' }, "mychannel");
+    backend.emit('deleted', { id: 'myid' }, "mychannel");
+
+
 Channels
 --------
 
@@ -174,6 +181,15 @@ specify a channel.
 
 Only clients sharing the same channel will receive updates from each other.  The channel
 associated with a given request is available from any middleware in `req.channel`.
+
+It is also possible to set the channel server side during the initial handshaking. For example:
+
+    io.set('authorization', function (data, accept) {
+        ...
+        data.channel = "mychannel";
+        ...
+ 
+
     
 Customizing
 -----------
