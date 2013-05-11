@@ -15,6 +15,7 @@ module.exports = function() {
                 // Assing configuration and defaults from node-config module to models
                 req.model[0] = _.extend(conf, {type: 'config'} );
                 req.model[1] = _.extend(conf.getOriginalConfig(), { type: 'defaults'} );
+                req.model[2] = _.extend(conf.getSchemaValidator(), { type: 'descriptions'} );
                 res.end(req.model);
             },
 
