@@ -12,11 +12,11 @@ module.exports = function(db, colname) {
     // cache up all this, it's just syntactical
     var collection = db.collection(colname);
 
-    var query_id = function(id) { 
+    var query_id = function(id) {
         try {
             return {$in: [id, mongo.ObjectID(id)]};
         }
-        catch (e) { 
+        catch (e) {
             return id;
         }
     };
