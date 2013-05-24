@@ -5,19 +5,23 @@
     "homepage":     "http://github.com/scttnlsn/backbone.io",
     "author":       "Scott Nelson <scottbnel@gmail.com>",
     "main":         "./lib/index",
-    
+
     "repository": {
         "type": "git",
         "url": "git://github.com/scttnlsn/backbone.io.git"
     },
-    
+
     "dependencies": {
         "socket.io": ">= 0.8.7"
     },
-    
+
     "devDependencies": {
         "express": ">= 2.5.0 < 3.0",
         "mocha": ">= 0.3.6",
         "sinon": ">= 1.2.0"
+    },
+
+    "scripts": {
+        "test": "make test"
     }
 }
