@@ -1,11 +1,15 @@
 var express = require('express');
 var backboneio = require('../lib/index');
 
-var sessions = new express.session.MemoryStore();
-var app = express.createServer();
+var app = express();
+
+var session = {
+    store: new express.session.MemoryStore(),
+    secret: 'mysecret'
+};
 
 app.use(express.cookieParser());
-app.use(express.session({ secret: 'mysecret', store: sessions }));
+app.use(express.session(session));
 app.use(express.static(__dirname));
 
 app.get('/login', function(req, res) {
@@ -18,7 +22,7 @@ app.get('/logout', function(req, res) {
     res.redirect('/');
 });
 
-app.listen(3000);
+var server = app.listen(3000);
 console.log('http://localhost:3000/');
 
 var auth = function(req, res, next) {
@@ -31,8 +35,8 @@ var auth = function(req, res, next) {
 
 var messages = backboneio.createBackend();
 messages.use(backboneio.middleware.cookieParser());
-messages.use(backboneio.middleware.session({ store: sessions }));
+messages.use(backboneio.middleware.session(session));
 messages.use('create', 'update', 'delete', auth);
 messages.use(backboneio.middleware.memoryStore());
 
-backboneio.listen(app, { messages: messages });
+backboneio.listen(server, { messages: messages });

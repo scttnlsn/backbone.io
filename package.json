@@ -12,12 +12,14 @@
     },
     
     "dependencies": {
-        "socket.io": ">= 0.8.7"
+        "cookie": "0.1.x",
+        "cookie-signature": "1.0.x",
+        "socket.io": "0.9.x"
     },
     
     "devDependencies": {
-        "express": ">= 2.5.0 < 3.0",
-        "mocha": ">= 0.3.6",
-        "sinon": ">= 1.2.0"
+        "express": "3.2.x",
+        "mocha": "1.10.x",
+        "sinon": "1.7.x"
     }
 }
