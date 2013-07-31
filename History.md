@@ -1,3 +1,10 @@
+0.4.0 / 2013-07-31
+==================
+
+* Updated to work with Express 3
+* Fixed Backbone.sync to handle undefined options
+* Fixed cookie/session middleware
+
 0.3.3 / 2013-01-18
 ==================
 
