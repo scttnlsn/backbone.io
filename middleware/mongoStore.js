@@ -61,8 +61,8 @@ module.exports = function(db, colname, options) {
 
                 var id = req.model._id;
 
-                console.log(JSON.stringify(item));
                 collection.update({'_id': id}, item, {safe:true}, function(err, result) {
+                    item['_id'] = req.model._id;
                     if (err) {
                         res.end({'error':'An error has occurred on update ' + err});
                     } else {
