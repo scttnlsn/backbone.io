@@ -1,4 +1,4 @@
-module.exports = function(db, colname) {
+module.exports = function(db, colname, options) {
     var mongo = require('mongoskin');
 
     var self = this;
@@ -12,7 +12,7 @@ module.exports = function(db, colname) {
     // cache up all this, it's just syntactical
     var collection = db.collection(colname);
 
-    return function(req, res, next) {
+    var ret = function(req, res, next) {
         var callback = function(err, result) {
             if (err) return next(err);
             res.end(result);
@@ -85,5 +85,11 @@ module.exports = function(db, colname) {
 
         if (!crud[req.method]) return next(new Error('Unsuppored method ' + req.method));
         crud[req.method]();
-    }
+    };
+
+    ret.options = options;
+    ret.collection = collection;
+    ret.db = db;
+    ret.colname = colname;
+    return ret;
 };
