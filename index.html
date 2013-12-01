@@ -28,16 +28,19 @@
         </ul>
       </header>
       <section>
-        <h1>Backbone.IO</h1>
+        <h1>
+<a name="backboneio" class="anchor" href="#backboneio"><span class="octicon octicon-link"></span></a>Backbone.IO</h1>
 
 <p>Backend-agnostic Backbone.js sync override and server notifications via Socket.IO.</p>
 
-<h2>Install</h2>
+<h2>
+<a name="install" class="anchor" href="#install"><span class="octicon octicon-link"></span></a>Install</h2>
 
 <pre><code>npm install backbone.io
 </code></pre>
 
-<h2>Usage</h2>
+<h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
 
 <p>On the server:</p>
 
@@ -74,7 +77,8 @@ backboneio.listen(app, { mybackend: backend });
 <p>Note that as of 0.3.x, one must explicitly call <code>Backbone.io.connect</code>.  Any
 optional arguments will be passed to Socket.IO's <code>io.connect</code> function.</p>
 
-<h2>Events</h2>
+<h2>
+<a name="events" class="anchor" href="#events"><span class="octicon octicon-link"></span></a>Events</h2>
 
 <p>When a model is synced with a particular backend, the backend will trigger events
 on collections (across multiple clients) that share the backend.  For example, we
@@ -124,7 +128,8 @@ event name on the server.</p>
 <pre><code>backboneio.listen(app, { mybackend: backend }, { event: 'myevent' });
 </code></pre>
 
-<h2>Backends and Middleware</h2>
+<h2>
+<a name="backends-and-middleware" class="anchor" href="#backends-and-middleware"><span class="octicon octicon-link"></span></a>Backends and Middleware</h2>
 
 <p>Backends are stacks of composable middleware (inspired by Connect) that are responsible
 for handling sync requests and responding appropriately.  Each middleware is a function
@@ -201,7 +206,8 @@ backend.emit('updated', { id: 'myid', foo: 'baz' });
 backend.emit('deleted', { id: 'myid' });
 </code></pre>
 
-<h2>Channels</h2>
+<h2>
+<a name="channels" class="anchor" href="#channels"><span class="octicon octicon-link"></span></a>Channels</h2>
 
 <p>To synchronize models between a subset of all clients sharing a single backend, you can
 specify a channel.</p>
@@ -216,13 +222,15 @@ specify a channel.</p>
 <p>Only clients sharing the same channel will receive updates from each other.  The channel
 associated with a given request is available from any middleware in <code>req.channel</code>.</p>
 
-<h2>Customizing</h2>
+<h2>
+<a name="customizing" class="anchor" href="#customizing"><span class="octicon octicon-link"></span></a>Customizing</h2>
 
 <p>In addition to middleware, the behavior of Backbone.IO can be customized via standard Socket.IO
 mechanisms.  The object returned from the call to <code>listen</code> is the Socket.IO object and can be
 manipulated further.  See <a href="http://socket.io">http://socket.io</a> for more details.</p>
 
-<h2>Tests</h2>
+<h2>
+<a name="tests" class="anchor" href="#tests"><span class="octicon octicon-link"></span></a>Tests</h2>
 
 <p>Install development dependencies:</p>
 
@@ -246,7 +254,7 @@ manipulated further.  See <a href="http://socket.io">http://socket.io</a> for mo
           </script>
           <script type="text/javascript">
             try {
-              var pageTracker = _gat._getTracker("UA-30677351-1");
+              var pageTracker = _gat._getTracker("UA-44029969-3");
             pageTracker._trackPageview();
             } catch(err) {}
           </script>
