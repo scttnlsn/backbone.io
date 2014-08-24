@@ -14,7 +14,7 @@ module.exports = function(Model) {
                 if (req.model._id) {
                     Model.findById(req.model._id, callback);
                 } else {
-                    Model.find(callback);
+                    Model.find(req.options.data, callback);
                 }
             },
             
