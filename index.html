@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Backbone.IO by scttnlsn</title>
+    <title>backbone.io by scttnlsn</title>
 
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
@@ -15,7 +15,7 @@
   <body>
     <div class="wrapper">
       <header>
-        <h1>Backbone.IO</h1>
+        <h1>backbone.io</h1>
         <p>Backbone.js sync via Socket.IO</p>
 
         <p class="view"><a href="https://github.com/scttnlsn/backbone.io">View the Project on GitHub <small>scttnlsn/backbone.io</small></a></p>
@@ -29,218 +29,11 @@
       </header>
       <section>
         <h1>
-<a name="backboneio" class="anchor" href="#backboneio"><span class="octicon octicon-link"></span></a>Backbone.IO</h1>
+<a id="backboneio" class="anchor" href="#backboneio" aria-hidden="true"><span class="octicon octicon-link"></span></a>backbone.io</h1>
 
-<p>Backend-agnostic Backbone.js sync override and server notifications via Socket.IO.</p>
+<p><strong>This project is deprecated and will no longer be maintained.</strong>  I've taken the best ideas from the project and incorporated them into a more versatile and well-designed library for syncing data via Socket.IO.  You can find it here: <a href="https://github.com/scttnlsn/data.io">https://github.com/scttnlsn/data.io</a></p>
 
-<h2>
-<a name="install" class="anchor" href="#install"><span class="octicon octicon-link"></span></a>Install</h2>
-
-<pre><code>npm install backbone.io
-</code></pre>
-
-<h2>
-<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
-
-<p>On the server:</p>
-
-<pre><code>var http = require('http');
-var backboneio = require('backbone.io');
-
-var app = http.createServer();    
-app.listen(3000);
-
-var backend = backboneio.createBackend();
-backend.use(backboneio.middleware.memoryStore());
-
-backboneio.listen(app, { mybackend: backend });
-</code></pre>
-
-<p>On the client:</p>
-
-<pre><code>&lt;!-- Include Underscore, Backbone --&gt;
-
-&lt;script src="/socket.io/socket.io.js"&gt;&lt;/script&gt;
-&lt;script src="/socket.io/backbone.io.js"&gt;&lt;/script&gt;
-
-&lt;script&gt;
-    Backbone.io.connect();
-
-    var MyCollection = Backbone.Collection.extend({
-        backend: 'mybackend'
-    });
-&lt;/script&gt;
-</code></pre>
-
-<p>Models in <code>MyCollection</code> will now be synced to <code>mybackend</code>.</p>
-
-<p>Note that as of 0.3.x, one must explicitly call <code>Backbone.io.connect</code>.  Any
-optional arguments will be passed to Socket.IO's <code>io.connect</code> function.</p>
-
-<h2>
-<a name="events" class="anchor" href="#events"><span class="octicon octicon-link"></span></a>Events</h2>
-
-<p>When a model is synced with a particular backend, the backend will trigger events
-on collections (across multiple clients) that share the backend.  For example, we
-could keep collections synced in realtime with the following event bindings:</p>
-
-<pre><code>var MyCollection = Backbone.Collection.extend({
-
-    backend: 'mybackend',
-
-    initialize: function() {
-        var self = this;
-
-        this.bind('backend:create', function(model) {
-            self.add(model);
-        });
-        this.bind('backend:update', function(model) {
-            self.get(model.id).set(model);
-        });
-        this.bind('backend:delete', function(model) {
-            self.remove(model.id);
-        });
-    }
-
-});
-</code></pre>
-
-<p>Or use the provided shortcut:</p>
-
-<pre><code>backend: 'mybackend',
-
-initialize: function() {
-    this.bindBackend();
-}
-</code></pre>
-
-<p>In addition to <code>backend:create</code>, <code>backend:read</code>, <code>backend:update</code>, and <code>backend:delete</code>
-events, a generic <code>backend</code> event is also triggered when a model is synced.</p>
-
-<pre><code>this.bind('backend', function(method, model) {
-    // Method will be one of create, read, update, or delete
-});
-</code></pre>
-
-<p>The event prefix <code>backend</code> is used by default but this can be customized by setting the
-event name on the server.</p>
-
-<pre><code>backboneio.listen(app, { mybackend: backend }, { event: 'myevent' });
-</code></pre>
-
-<h2>
-<a name="backends-and-middleware" class="anchor" href="#backends-and-middleware"><span class="octicon octicon-link"></span></a>Backends and Middleware</h2>
-
-<p>Backends are stacks of composable middleware (inspired by Connect) that are responsible
-for handling sync requests and responding appropriately.  Each middleware is a function
-that accepts request and response objects (and optionally a function that can be called
-to continue down the stack).  A middleware will generally either return a result by
-calling <code>end</code> on the response object or pass control downward.  For example, let's add a
-logger middleware to our backend:</p>
-
-<pre><code>var backend = backboneio.createBackend();
-
-backend.use(function(req, res, next) {
-    console.log(req.backend);
-    console.log(req.method);
-    console.log(JSON.stringify(req.model));
-    next();
-});
-
-backend.use(backboneio.middleware.memoryStore());
-</code></pre>
-
-<p>A request object will contain the following components (in addition to those set by
-various middleware):</p>
-
-<ul>
-<li>
-<code>method</code>: the sync method (<code>create</code>, <code>read</code>, <code>update</code>, or <code>delete</code>)</li>
-<li>
-<code>model</code>: the model object to by synced</li>
-<li>
-<code>options</code>: any options set by the client (except success and error callbacks)</li>
-<li>
-<code>backend</code>: name of the backend responsible for handling the request</li>
-<li>
-<code>socket</code>: the client socket that initiated the request</li>
-</ul><p>Middleware can also be applied to only particular types of requests by passing the desired
-contexts to <code>use</code>:</p>
-
-<pre><code>backend.use('create', 'update', 'delete', function(req, res, next) {
-    if (isAuthorized(req)) {
-        next();
-    } else {
-        next(new Error('Unauthorized'));
-    }
-});
-</code></pre>
-
-<p>Or alternatively by using one of the four helper methods (<code>create</code>, <code>read</code>, <code>update</code>, <code>delete</code>):</p>
-
-<pre><code>backend.read(function(req, res) {
-    if (req.model.id) {
-        req.end(mymodels[req.model.id]);
-    } else {
-        req.end(mymodels);
-    }
-});
-</code></pre>
-
-<p>If the bottom of the middleware stack is reached before a result is returned then the requested
-model is returned by default: <code>res.end(req.model)</code>.  Look in the <code>middleware</code> directory for more
-examples.</p>
-
-<p>Clients are automatically notified of events triggered by other clients, however, there may
-be cases where other server-side code needs to make updates to a model outside of a backend
-handler.  In such a case, one can notify clients by emitting events directly on the backend.
-For example:</p>
-
-<pre><code>var backend = backboneio.createBackend();
-backend.use(backboneio.middleware.memoryStore());
-
-// Clients will receive 'backend:create', 'backend:update',
-// and 'backend:delete' events respectively.
-backend.emit('created', { id: 'myid', foo: 'bar' });
-backend.emit('updated', { id: 'myid', foo: 'baz' });
-backend.emit('deleted', { id: 'myid' });
-</code></pre>
-
-<h2>
-<a name="channels" class="anchor" href="#channels"><span class="octicon octicon-link"></span></a>Channels</h2>
-
-<p>To synchronize models between a subset of all clients sharing a single backend, you can
-specify a channel.</p>
-
-<pre><code>var MyCollection = Backbone.Collection.extend({
-
-    backend: { name: 'mybackend', channel: 'mychannel' }
-
-});
-</code></pre>
-
-<p>Only clients sharing the same channel will receive updates from each other.  The channel
-associated with a given request is available from any middleware in <code>req.channel</code>.</p>
-
-<h2>
-<a name="customizing" class="anchor" href="#customizing"><span class="octicon octicon-link"></span></a>Customizing</h2>
-
-<p>In addition to middleware, the behavior of Backbone.IO can be customized via standard Socket.IO
-mechanisms.  The object returned from the call to <code>listen</code> is the Socket.IO object and can be
-manipulated further.  See <a href="http://socket.io">http://socket.io</a> for more details.</p>
-
-<h2>
-<a name="tests" class="anchor" href="#tests"><span class="octicon octicon-link"></span></a>Tests</h2>
-
-<p>Install development dependencies:</p>
-
-<pre><code>npm install
-</code></pre>
-
-<p>Run the test suite:</p>
-
-<pre><code>make test
-</code></pre>
+<p>Note that <a href="https://github.com/scttnlsn/data.io">data.io</a> does not depend on <a href="http://backbonejs.org">Backbone</a> (like <a href="https://github.com/scttnlsn/backbone.io">backbone.io</a> did) so if you're looking to integrate <a href="https://github.com/scttnlsn/data.io">data.io</a> with a Backbone project please refer to <a href="https://github.com/scttnlsn/data.io/tree/master/examples/backbone">this example</a>.</p>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/scttnlsn">scttnlsn</a></p>
