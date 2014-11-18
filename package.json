@@ -1,25 +1,22 @@
 {
-    "name":         "backbone.io",
-    "version":      "0.4.1",
-    "description":  "Backbone.js sync via Socket.IO",
-    "homepage":     "http://github.com/scttnlsn/backbone.io",
-    "author":       "Scott Nelson <scottbnel@gmail.com>",
-    "main":         "./lib/index",
-    
-    "repository": {
-        "type": "git",
-        "url": "git://github.com/scttnlsn/backbone.io.git"
-    },
-    
-    "dependencies": {
-        "cookie": "0.1.x",
-        "cookie-signature": "1.0.x",
-        "socket.io": "0.9.x"
-    },
-    
-    "devDependencies": {
-        "express": "3.2.x",
-        "mocha": "1.10.x",
-        "sinon": "1.7.x"
-    }
+  "name": "backbone.io",
+  "version": "0.4.1",
+  "description": "Backbone.js sync via Socket.IO",
+  "homepage": "http://github.com/scttnlsn/backbone.io",
+  "author": "Scott Nelson <scottbnel@gmail.com>",
+  "main": "./lib/index",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/scttnlsn/backbone.io.git"
+  },
+  "dependencies": {
+    "cookie": "0.1.x",
+    "cookie-signature": "1.0.x",
+    "socket.io": "^1.1.0"
+  },
+  "devDependencies": {
+    "express": "3.2.x",
+    "mocha": "1.10.x",
+    "sinon": "1.7.x"
+  }
 }
